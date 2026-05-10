@@ -10,12 +10,21 @@ import sqlite3
 from datetime import datetime
 import hashlib
 import secrets
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # Database configuration
 DATABASE = os.environ.get('DATABASE_URL', 'quickredtech.db').replace('sqlite:///', '')
+
+# Brevo SMTP Configuration
+SMTP_SERVER = os.environ.get('BREVO_SMTP_SERVER', 'smtp-relay.brevo.com')
+SMTP_PORT = int(os.environ.get('BREVO_SMTP_PORT', 587))
+SMTP_LOGIN = os.environ.get('BREVO_SMTP_LOGIN', 'aa47d9001@smtp-brevo.com')
+SMTP_KEY = os.environ.get('BREVO_SMTP_KEY', '')
 
 def get_db():
     """Get database connection"""
@@ -129,64 +138,78 @@ def submit_request():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 def send_confirmation_email(data):
-    """Send confirmation email using Brevo API"""
+    """Send confirmation email using Brevo SMTP"""
     try:
-        import requests
-        
-        brevo_api_key = os.environ.get('BREVO_API_KEY')
-        if not brevo_api_key:
-            print("Brevo API key not configured")
+        if not SMTP_KEY:
+            print("Brevo SMTP key not configured")
             return
         
-        url = "https://api.brevo.com/v3/smtp/email"
+        # Create message
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = "Website Request Confirmation - Quick Red Tech"
+        msg['From'] = f"{os.environ.get('BREVO_SENDER_NAME', 'Quick Red Tech')} <{os.environ.get('BREVO_SENDER_EMAIL', 'noreply@quickredtech.com')}>"
+        msg['To'] = data['email']
         
-        headers = {
-            "accept": "application/json",
-            "content-type": "application/json",
-            "api-key": brevo_api_key
-        }
+        # Plain text version
+        text = f"""
+        Thank You for Your Interest!
         
-        payload = {
-            "sender": {
-                "name": os.environ.get('BREVO_SENDER_NAME', 'Quick Red Tech'),
-                "email": os.environ.get('BREVO_SENDER_EMAIL', 'noreply@quickredtech.com')
-            },
-            "to": [
-                {
-                    "email": data['email'],
-                    "name": data['full_name']
-                }
-            ],
-            "subject": "Website Request Confirmation - Quick Red Tech",
-            "htmlContent": f"""
-            <html>
-                <body style="font-family: Arial, sans-serif; background: #0a0a0a; color: #ffffff;">
-                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <h1 style="color: #ff0000;">Thank You for Your Interest!</h1>
-                        <p>Dear {data['full_name']},</p>
-                        <p>We have received your website request for <strong>{data['business_name']}</strong>.</p>
-                        <p>Our team will review your requirements and contact you within 24-48 hours.</p>
-                        
-                        <h3>Request Details:</h3>
-                        <ul>
-                            <li><strong>Website Type:</strong> {data['website_type']}</li>
-                            <li><strong>Budget:</strong> {data['budget']}</li>
-                            <li><strong>Email:</strong> {data['email']}</li>
-                            <li><strong>Phone:</strong> {data['phone']}</li>
-                        </ul>
-                        
-                        <p style="color: #ff0000; font-weight: bold;">We're excited to build your dream website!</p>
-                        
-                        <p>Best regards,<br>Quick Red Tech Team</p>
-                    </div>
-                </body>
-            </html>
-            """
-        }
+        Dear {data['full_name']},
         
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()
-        print(f"Email sent successfully: {response.status_code}")
+        We have received your website request for {data['business_name']}.
+        Our team will review your requirements and contact you within 24-48 hours.
+        
+        Request Details:
+        - Website Type: {data['website_type']}
+        - Budget: {data['budget']}
+        - Email: {data['email']}
+        - Phone: {data['phone']}
+        
+        We're excited to build your dream website!
+        
+        Best regards,
+        Quick Red Tech Team
+        """
+        
+        # HTML version
+        html = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; background: #0a0a0a; color: #ffffff;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h1 style="color: #ff0000;">Thank You for Your Interest!</h1>
+                    <p>Dear {data['full_name']},</p>
+                    <p>We have received your website request for <strong>{data['business_name']}</strong>.</p>
+                    <p>Our team will review your requirements and contact you within 24-48 hours.</p>
+                    
+                    <h3>Request Details:</h3>
+                    <ul>
+                        <li><strong>Website Type:</strong> {data['website_type']}</li>
+                        <li><strong>Budget:</strong> {data['budget']}</li>
+                        <li><strong>Email:</strong> {data['email']}</li>
+                        <li><strong>Phone:</strong> {data['phone']}</li>
+                    </ul>
+                    
+                    <p style="color: #ff0000; font-weight: bold;">We're excited to build your dream website!</p>
+                    
+                    <p>Best regards,<br>Quick Red Tech Team</p>
+                </div>
+            </body>
+        </html>
+        """
+        
+        # Attach both versions
+        part1 = MIMEText(text, 'plain')
+        part2 = MIMEText(html, 'html')
+        msg.attach(part1)
+        msg.attach(part2)
+        
+        # Send via SMTP
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_LOGIN, SMTP_KEY)
+            server.sendmail(msg['From'], data['email'], msg.as_string())
+        
+        print(f"Email sent successfully to {data['email']}")
         
     except Exception as e:
         print(f"Error sending email: {str(e)}")
