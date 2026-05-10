@@ -1,0 +1,39 @@
+```
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+quickredtech.db
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Dependencies
+requirements.txt
+
+# Static files (if they are generated)
+static/css/*.css.map
+static/js/*.js.map
+```

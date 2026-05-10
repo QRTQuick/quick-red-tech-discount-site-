@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Quick Red Tech</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-red: #ff0000;
+            --bg-dark: #0a0a0a;
+            --bg-darker: #050505;
+            --bg-card: #121212;
+            --text-white: #ffffff;
+            --text-gray: #b3b3b3;
+            --gradient-red: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.1);
+            --shadow-red: 0 0 30px rgba(255, 0, 0, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+        }
+        
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: var(--border-glass);
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding: 0 10px;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary-red);
+        }
+        
+        .logo span {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-bottom: 10px;
+        }
+        
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: var(--text-gray);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: rgba(255, 0, 0, 0.1);
+            color: var(--text-white);
+        }
+        
+        .nav-links a i {
+            width: 20px;
+            color: var(--primary-red);
+        }
+        
+        .logout-btn {
+            margin-top: 30px;
+            border-top: var(--border-glass);
+            padding-top: 20px;
+        }
+        
+        .logout-btn a {
+            color: #ff6666;
+        }
+        
+        .logout-btn a:hover {
+            background: rgba(255, 0, 0, 0.1);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-avatar i {
+            color: var(--primary-red);
+            font-size: 1.2rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 15px;
+            border: var(--border-glass);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-red);
+            box-shadow: var(--shadow-red);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-icon i {
+            font-size: 1.8rem;
+            color: var(--primary-red);
+        }
+        
+        .stat-info h3 {
+            font-size: 2rem;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 5px;
+        }
+        
+        .stat-info p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Recent Submissions */
+        .section-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            border: var(--border-glass);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-red);
+            color: var(--text-white);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: var(--shadow-red);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary-red);
+            color: var(--text-white);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(255, 0, 0, 0.1);
+        }
+        
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        th {
+            color: var(--text-gray);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        
+        tr:hover {
+            background: rgba(255, 0, 0, 0.05);
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: rgba(254, 188, 46, 0.1);
+            color: #febc2e;
+        }
+        
+        .status-completed {
+            background: rgba(40, 200, 64, 0.1);
+            color: #28c840;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn.edit {
+            background: rgba(254, 188, 46, 0.1);
+            color: #febc2e;
+        }
+        
+        .action-btn.delete {
+            background: rgba(255, 0, 0, 0.1);
+            color: var(--primary-red);
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .flash-message.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid var(--primary-red);
+            color: #ff6666;
+        }
+        
+        .flash-message.success {
+            background: rgba(40, 200, 64, 0.1);
+            border: 1px solid #28c840;
+            color: #4ade80;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: var(--border-glass);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <span>QUICK RED TECH</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li>
+                    <a href="{{ url_for('admin_dashboard') }}" class="active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_submissions') }}">
+                        <i class="fas fa-inbox"></i>
+                        <span>All Requests</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('export_submissions') }}">
+                        <i class="fas fa-download"></i>
+                        <span>Export Data</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="logout-btn">
+                <a href="{{ url_for('admin_logout') }}" class="nav-links a">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Dashboard Overview</h1>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <strong>{{ admin_email }}</strong>
+                    </div>
+                </div>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">
+                                <i class="fas fa-{% if category == 'error' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.total }}</h3>
+                        <p>Total Requests</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.pending }}</h3>
+                        <p>Pending Requests</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ stats.completed }}</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Submissions -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>Recent Requests</h2>
+                    <a href="{{ url_for('admin_submissions') }}" class="btn btn-outline">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Business</th>
+                                <th>Type</th>
+                                <th>Budget</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in submissions %}
+                            <tr>
+                                <td>#{{ submission.id }}</td>
+                                <td>{{ submission.full_name }}</td>
+                                <td>{{ submission.email }}</td>
+                                <td>{{ submission.business_name }}</td>
+                                <td>{{ submission.website_type }}</td>
+                                <td>{{ submission.budget }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ submission.status }}">
+                                        {{ submission.status|capitalize }}
+                                    </span>
+                                </td>
+                                <td>{{ submission.created_at[:10] }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" style="text-align: center; color: var(--text-gray);">
+                                    No submissions yet
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
